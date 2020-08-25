@@ -1,0 +1,13 @@
+{
+  "name": "peloton_to_garmin",
+  "version": "1.0.0",
+  "description": "Electron-based utility to move peloton cycling workouts to garmin",
+  "main": "./main.prod.js",
+  "author": "kippmr",
+  "scripts": {
+    "electron-rebuild": "node -r ../internals/scripts/BabelRegister.js ../internals/scripts/ElectronRebuild.js",
+    "postinstall": "yarn electron-rebuild"
+  },
+  "license": "MIT",
+  "dependencies": {}
+}
