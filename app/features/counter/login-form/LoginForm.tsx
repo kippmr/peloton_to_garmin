@@ -16,7 +16,7 @@ export const LoginForm: React.FunctionComponent<LoginFormProps> = ({
   const [password, setPassword] = React.useState<string>('');
 
   return (
-    <div className={'card ' + styles.base_card}>
+    <div className={'card ' + styles.base_card_sm}>
       <h3 className={'card-header'}>{brandName} login</h3>
       <div className={'card-body'}>
         <form>
