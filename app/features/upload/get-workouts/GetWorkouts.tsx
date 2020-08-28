@@ -5,6 +5,7 @@ import { PelotonLoginResponse } from '../../external-api/peloton/login/PelotonLo
 import { PelotonWorkoutList } from '../../external-api/peloton/peloton-workout-list/PelotonWorkoutList';
 import '../../counter/Counter.css';
 import styles from '../../counter/Counter.css';
+import { PelotonWorkoutToTcx } from '../peloton-workout-to-tcx/PelotonWorkoutToTcx';
 
 export type GetWorkoutsProps = {
   credentials: CredentialsProperties[];
@@ -37,6 +38,7 @@ export const GetWorkouts: React.FunctionComponent<GetWorkoutsProps> = ({
             url: `https://api.onepeloton.ca/api/user/${res.data.user_id}/workouts?joins=ride&limit=100&page=0`,
           }).then((res: AxiosResponse<PelotonWorkoutList>) => {
             console.log('get workouts response', res);
+            console.log(PelotonWorkoutToTcx('asd'));
             return res;
           });
         });
@@ -61,10 +63,10 @@ export const GetWorkouts: React.FunctionComponent<GetWorkoutsProps> = ({
             </h3>
             <div className={'card-body'}>
               <div className="row g-0 position-relative">
-                <div className="col-md-3 mb-md-0 p-md-4">
+                <div className="col-md-3 mb-md-0 p-md-1">
                   <img src={workout.ride.image_url} className="w-100" alt="" />
                 </div>
-                <div className="col-md-9 p-4 pl-md-0">
+                <div className="col-md-9">
                   <p>{JSON.stringify(workout.id)}</p>
                   <button
                     className="btn btn-primary stretched-link"

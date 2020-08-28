@@ -22,11 +22,13 @@ export const LoginForm: React.FunctionComponent<LoginFormProps> = ({
         <form>
           <Input
             label={'Username'}
+            type={'text'}
             placeholder={`Enter your ${brandName} username`}
             onChange={(text) => setUsername(() => text)}
           />
           <Input
             label={'Password'}
+            type={'password'}
             placeholder={`Enter your ${brandName} password`}
             onChange={(text) => setPassword(() => text)}
           />
