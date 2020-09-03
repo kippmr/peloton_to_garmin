@@ -1,6 +1,9 @@
 import { create } from 'xmlbuilder2';
+import { PelotonPerformaceData } from '../../external-api/peloton/peloton-performance-data/PelotonPerformaceData';
 
-export function PelotonWorkoutToTcx(workoutJson: any): string {
+export function PelotonWorkoutToTcx(
+  workoutJson: PelotonPerformaceData
+): string {
   const root = create({ encoding: 'UTF-8' })
     .ele('TrainingCenterDatabase', {
       'xmlns:ns2': 'http://www.garmin.com/xmlschemas/UserProfile/v2',
@@ -18,28 +21,59 @@ export function PelotonWorkoutToTcx(workoutJson: any): string {
     .up()
     .ele('Lap', { StartTime: '2020-07-30T17:25:10Z' })
     .ele('TotalTimeSeconds')
-    .txt('1800')
+    .txt(workoutJson.duration.toString())
     .up()
     .ele('DistanceMeters')
-    .txt('13952.98')
+    .txt(
+      (
+        (workoutJson.summaries.find((summary) => summary.slug === 'distance')
+          ?.value || 0) * 1000
+      ).toString()
+    )
     .up()
     .ele('MaximumSpeed')
-    .txt('13.74')
+    .txt(
+      (
+        workoutJson.metrics.find((segment) => segment.slug === 'speed')
+          ?.max_value || 0
+      ).toString()
+    )
     .up()
     .ele('AverageHeartRateBpm')
     .ele('Value')
-    .txt('180')
+    .txt(
+      (
+        workoutJson.metrics.find((segment) => segment.slug === 'heart_rate')
+          ?.average_value || 0
+      ).toString()
+    )
     .up()
     .up()
     .ele('MaximumHeartRateBpm')
     .ele('Value')
+    .txt(
+      (
+        workoutJson.metrics.find((segment) => segment.slug === 'heart_rate')
+          ?.max_value || 0
+      ).toString()
+    )
     .up()
     .up()
     .ele('Calories')
-    .txt('537')
+    .txt(
+      (
+        workoutJson.summaries.find((summary) => summary.slug === 'calories')
+          ?.value || 0
+      ).toString()
+    )
     .up()
     .ele('Cadence')
-    .txt('84')
+    .txt(
+      (
+        workoutJson.metrics.find((segment) => segment.slug === 'cadence')
+          ?.average_value || 0
+      ).toString()
+    )
     .up()
     .ele('Intensity')
     .txt('Active')
@@ -52,7 +86,12 @@ export function PelotonWorkoutToTcx(workoutJson: any): string {
       xmlns: 'http://www.garmin.com/xmlschemas/ActivityExtension/v2',
     })
     .ele('TotalPower')
-    .txt('225710.1')
+    .(
+      (
+        (workoutJson.summaries.find((segment) => segment.slug === 'total_output')
+          ?.value || 0) * 1000
+      ).toString()
+    )
     .up()
     .ele('AverageCadence')
     .txt('84.94')
@@ -76,7 +115,7 @@ export function PelotonWorkoutToTcx(workoutJson: any): string {
     .up()
     .ele('Track');
 
-  for (const i of [1, 2, 3, 4]) {
+  for (const i of workoutJson.seconds_since_pedaling_start) {
     root
       .ele('TrackPoint')
       .ele('Time')
