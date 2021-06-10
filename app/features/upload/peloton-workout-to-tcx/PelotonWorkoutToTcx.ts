@@ -2,8 +2,10 @@ import { create } from 'xmlbuilder2';
 import { PelotonPerformaceData } from '../../external-api/peloton/peloton-performance-data/PelotonPerformaceData';
 
 export function PelotonWorkoutToTcx(
-  workoutJson: PelotonPerformaceData
+  workoutJson: PelotonPerformaceData,
+  startTime: Date
 ): string {
+  console.log('start xml parse');
   const root = create({ encoding: 'UTF-8' })
     .ele('TrainingCenterDatabase', {
       'xmlns:ns2': 'http://www.garmin.com/xmlschemas/UserProfile/v2',
@@ -17,9 +19,9 @@ export function PelotonWorkoutToTcx(
     .ele('Activities')
     .ele('Activity', { Sport: 'Biking' })
     .ele('Id')
-    .txt('2020-07-30T17:25:10Z')
+    .txt(startTime.toISOString())
     .up()
-    .ele('Lap', { StartTime: '2020-07-30T17:25:10Z' })
+    .ele('Lap', { StartTime: startTime.toISOString() })
     .ele('TotalTimeSeconds')
     .txt(workoutJson.duration.toString())
     .up()
@@ -34,8 +36,12 @@ export function PelotonWorkoutToTcx(
     .ele('MaximumSpeed')
     .txt(
       (
-        workoutJson.metrics.find((segment) => segment.slug === 'speed')
-          ?.max_value || 0
+        Math.round(
+          ((workoutJson.metrics.find((segment) => segment.slug === 'speed')
+            ?.max_value || 0) /
+            3.6) *
+            10
+        ) / 10
       ).toString()
     )
     .up()
@@ -86,10 +92,11 @@ export function PelotonWorkoutToTcx(
       xmlns: 'http://www.garmin.com/xmlschemas/ActivityExtension/v2',
     })
     .ele('TotalPower')
-    .(
+    .txt(
       (
-        (workoutJson.summaries.find((segment) => segment.slug === 'total_output')
-          ?.value || 0) * 1000
+        (workoutJson.summaries.find(
+          (segment) => segment.slug === 'total_output'
+        )?.value || 0) * 1000
       ).toString()
     )
     .up()
@@ -115,44 +122,75 @@ export function PelotonWorkoutToTcx(
     .up()
     .ele('Track');
 
-  for (const i of workoutJson.seconds_since_pedaling_start) {
+  let totalDistanceMeters = 0;
+  workoutJson.seconds_since_pedaling_start.forEach((value, index) => {
+    // for (const i of workoutJson.seconds_since_pedaling_start) {
+    const speedMetersPerSecond =
+      Math.round(
+        ((workoutJson.metrics.find((metric) => metric.slug === 'speed')?.values[
+          index
+        ] || 0) /
+          3.6) *
+          10
+      ) / 10;
+    totalDistanceMeters += speedMetersPerSecond * 5;
     root
       .ele('TrackPoint')
       .ele('Time')
-      .txt('2020-07-30T17:25:11Z')
+      .txt(new Date(startTime.getTime() + value * 1000).toISOString())
       .up()
       .ele('DistanceMeters')
-      .txt('0')
+      .txt(totalDistanceMeters.toString())
       .up()
       .ele('HeartRateBpm')
       .ele('Value')
-      .txt('0')
+      .txt(
+        (
+          workoutJson.metrics.find((metric) => metric.slug === 'heart rate')
+            ?.values[index] || 0
+        ).toString()
+      )
       .up()
       .up()
       .ele('Cadence')
-      .txt('68')
+      .txt(
+        (
+          workoutJson.metrics.find((metric) => metric.slug === 'cadence')
+            ?.values[index] || 0
+        ).toString()
+      )
       .up()
       .ele('Extensions')
       .ele('TPX', {
         xmlns: 'http://www.garmin.com/xmlschemas/ActivityExtension/v2',
       })
       .ele('Speed')
-      .txt('4.82')
+      .txt(speedMetersPerSecond.toString())
       .up()
       .ele('Watts')
-      .txt('40')
+      .txt(
+        (
+          workoutJson.metrics.find((metric) => metric.slug === 'output')
+            ?.values[index] || 0
+        ).toString()
+      )
       .up()
       .ele('Resistance')
-      .txt('40.1')
+      .txt(
+        (
+          workoutJson.metrics.find((metric) => metric.slug === 'resistance')
+            ?.values[index] || 0
+        ).toString()
+      )
       .up()
       .up()
       .up()
       .up();
-  }
+  });
 
   const xml = root.end({ prettyPrint: true });
 
-  console.log(xml);
+  // console.log('xml', xml);
 
   return xml;
 }

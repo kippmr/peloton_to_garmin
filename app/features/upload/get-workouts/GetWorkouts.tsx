@@ -1,11 +1,13 @@
 import React from 'react';
 import { CredentialsProperties } from '../../../db/schemas/credentials';
-import Axios, { AxiosResponse } from 'axios';
+import Axios from 'axios';
 import { PelotonLoginResponse } from '../../external-api/peloton/login/PelotonLoginResponse';
 import { PelotonWorkoutList } from '../../external-api/peloton/peloton-workout-list/PelotonWorkoutList';
 import '../../counter/Counter.css';
 import styles from '../../counter/Counter.css';
 import { PelotonWorkoutToTcx } from '../peloton-workout-to-tcx/PelotonWorkoutToTcx';
+import { remote } from 'electron';
+import { PelotonPerformaceData } from '../../external-api/peloton/peloton-performance-data/PelotonPerformaceData';
 
 export type GetWorkoutsProps = {
   credentials: CredentialsProperties[];
@@ -23,27 +25,72 @@ export const GetWorkouts: React.FunctionComponent<GetWorkoutsProps> = ({
 
     if (pelotonCredential) {
       const fetchData = async () => {
-        const response = await Axios({
-          method: 'post',
-          url: 'https://api.onepeloton.ca/auth/login',
-          data: {
+        // required to persist the cookies
+        // const session = window.require('electron').remote.session;
+        const session = remote.session;
+
+        const loginResponse = await Axios.post<PelotonLoginResponse>(
+          'https://api.onepeloton.ca/auth/login',
+          {
             username_or_email: credentials[0].username,
             password: credentials[0].password,
             with_pubsub: false,
-          },
-        }).then(async (res: AxiosResponse<PelotonLoginResponse>) => {
-          console.log('login response', res.data.user_id);
-          return await Axios({
-            method: 'get',
-            url: `https://api.onepeloton.ca/api/user/${res.data.user_id}/workouts?joins=ride&limit=100&page=0`,
-          }).then((res: AxiosResponse<PelotonWorkoutList>) => {
-            console.log('get workouts response', res);
-            console.log(PelotonWorkoutToTcx('asd'));
-            return res;
-          });
+          }
+        );
+        console.log('login response', loginResponse.data.user_id);
+        await session.defaultSession.cookies.set({
+          url: 'https://api.onepeloton.ca/',
+          name: 'peloton_session_id',
+          value: loginResponse.data.session_id,
         });
 
-        setData(response.data);
+        const listResponse = await Axios.get<PelotonWorkoutList>(
+          `https://api.onepeloton.ca/api/user/${loginResponse.data.user_id}/workouts?joins=ride&limit=100&page=0`
+        );
+        console.log('get response', listResponse);
+
+        const workoutResponse = await Axios.get<PelotonPerformaceData>(
+          `https://api.onepeloton.ca/api/workout/${listResponse.data.data[0].id}/performance_graph?every_n=5`
+        );
+        console.log('workout response', workoutResponse.data);
+        console.log(
+          'convert',
+          PelotonWorkoutToTcx(
+            workoutResponse.data,
+            new Date(listResponse.data.data[0].device_time_created_at * 1000)
+          )
+        );
+
+        // const response = await Axios({
+        //   method: 'post',
+        //   url: 'https://api.onepeloton.ca/auth/login',
+        //   data: {
+        //     username_or_email: credentials[0].username,
+        //     password: credentials[0].password,
+        //     with_pubsub: false,
+        //   },
+        // }).then(async (res: AxiosResponse<PelotonLoginResponse>) => {
+        //   console.log('login response', res.data.user_id);
+        //   await session.defaultSession.cookies.set({
+        //     url: 'https://api.onepeloton.ca/',
+        //     name: 'peloton_session_id',
+        //     value: res.data.session_id,
+        //   });
+        //   return await Axios({
+        //     method: 'get',
+        //     url: `https://api.onepeloton.ca/api/user/${res.data.user_id}/workouts?joins=ride&limit=100&page=0`,
+        //   }).then((res: AxiosResponse<PelotonWorkoutList>) => {
+        //     console.log('get workouts response', res);
+        //     await Axios({
+        //       method: 'get',
+        //       url: `https://api.onepeloton.ca/api/workout/__ID_HERE__/performance_graph?every_n=5`,
+        //     });
+        //     console.log(PelotonWorkoutToTcx('asd'));
+        //     return res;
+        //   });
+        // });
+
+        setData(listResponse.data);
       };
 
       fetchData().finally();
