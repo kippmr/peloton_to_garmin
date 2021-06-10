@@ -33,4 +33,19 @@ export class CredentialsStore {
       'properties.provider': provider,
     });
   }
+
+  public async getCredentialsByProviders(
+    providers: string[]
+  ): Promise<Credentials[]> {
+    let credentials: Credentials[] = [];
+    for (let provider of providers) {
+      credentials.push(
+        await this.dbInstance.findOne({
+          type: 'credentials',
+          'properties.provider': provider,
+        })
+      );
+    }
+    return credentials;
+  }
 }

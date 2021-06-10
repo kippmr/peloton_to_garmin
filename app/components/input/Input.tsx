@@ -3,12 +3,14 @@ import React from 'react';
 export type InputProps = {
   label: string;
   placeholder: string;
+  type: string;
   onChange: (text: string) => void;
 };
 
 export const Input: React.FunctionComponent<InputProps> = ({
   label,
   placeholder,
+  type,
   onChange,
 }) => {
   return (
@@ -19,7 +21,7 @@ export const Input: React.FunctionComponent<InputProps> = ({
       <input
         id={'input'}
         required
-        type="text"
+        type={type}
         placeholder={placeholder}
         onChange={(e) => onChange(e.currentTarget.value)}
         className={'form-control'}

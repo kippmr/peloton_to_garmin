@@ -15,26 +15,15 @@ export function LoadWorkouts(): React.ReactElement {
   const [missingProviders, setMissingProviders] = React.useState<string[]>([]);
 
   React.useEffect(() => {
-    for (const provider of providers) {
-      db.getCredentialsByProvider(provider)
-        .then((res) =>
-          res
-            ? setCredentials((oldCredentials) => [
-                ...oldCredentials,
-                res.properties,
-              ])
-            : setMissingProviders((oldMissingProviders) => [
-                ...oldMissingProviders,
-                provider,
-              ])
-        )
-        .catch(() =>
-          setMissingProviders((oldMissingProviders) => [
-            ...oldMissingProviders,
-            provider,
-          ])
-        );
-    }
+    db.getCredentialsByProviders(providers)
+      .then((res) => {
+        if (res) {
+          setCredentials(res.map(({ properties }) => properties));
+        } else {
+          setMissingProviders([...providers]);
+        }
+      })
+      .catch(() => setMissingProviders([...providers]));
   }, []);
 
   return missingProviders.length ? (
