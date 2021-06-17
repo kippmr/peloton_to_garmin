@@ -5,7 +5,6 @@ export function PelotonWorkoutToTcx(
   workoutJson: PelotonPerformaceData,
   startTime: Date
 ): string {
-  console.log('start xml parse');
   const root = create({ encoding: 'UTF-8' })
     .ele('TrainingCenterDatabase', {
       'xmlns:ns2': 'http://www.garmin.com/xmlschemas/UserProfile/v2',
@@ -27,7 +26,7 @@ export function PelotonWorkoutToTcx(
     .up()
     .ele('DistanceMeters')
     .txt(
-      (
+      Math.round(
         (workoutJson.summaries.find((summary) => summary.slug === 'distance')
           ?.value || 0) * 1000
       ).toString()
@@ -93,7 +92,7 @@ export function PelotonWorkoutToTcx(
     })
     .ele('TotalPower')
     .txt(
-      (
+      Math.round(
         (workoutJson.summaries.find(
           (segment) => segment.slug === 'total_output'
         )?.value || 0) * 1000
@@ -101,22 +100,22 @@ export function PelotonWorkoutToTcx(
     )
     .up()
     .ele('AverageCadence')
-    .txt('84.94')
+    .txt('81')
     .up()
     .ele('MaximumCadence')
-    .txt('164')
+    .txt('126')
     .up()
     .ele('AverageResistance')
-    .txt('40.22')
+    .txt('40')
     .up()
     .ele('MaximumResistance')
-    .txt('48.83')
+    .txt('55')
     .up()
     .ele('AverageWatts')
-    .txt('125.61')
+    .txt('107')
     .up()
     .ele('MaximumWatts')
-    .txt('534.5')
+    .txt('228')
     .up()
     .up()
     .up()
@@ -133,14 +132,14 @@ export function PelotonWorkoutToTcx(
           3.6) *
           10
       ) / 10;
-    totalDistanceMeters += speedMetersPerSecond * 5;
+    totalDistanceMeters += speedMetersPerSecond;
     root
       .ele('TrackPoint')
       .ele('Time')
       .txt(new Date(startTime.getTime() + value * 1000).toISOString())
       .up()
       .ele('DistanceMeters')
-      .txt(totalDistanceMeters.toString())
+      .txt((Math.round(totalDistanceMeters * 10) / 10).toString())
       .up()
       .ele('HeartRateBpm')
       .ele('Value')
@@ -165,7 +164,7 @@ export function PelotonWorkoutToTcx(
         xmlns: 'http://www.garmin.com/xmlschemas/ActivityExtension/v2',
       })
       .ele('Speed')
-      .txt(speedMetersPerSecond.toString())
+      .txt((Math.round(speedMetersPerSecond * 10) / 10).toString())
       .up()
       .ele('Watts')
       .txt(
