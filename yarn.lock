@@ -10489,14 +10489,15 @@ xdg-basedir@^4.0.0:
   resolved "https://registry.yarnpkg.com/xdg-basedir/-/xdg-basedir-4.0.0.tgz#4bc8d9984403696225ef83a1573cbbcb4e79db13"
   integrity sha512-PSNhEJDejZYV7h50BohL09Er9VaIefr2LMAf3OEmpCkjOi34eYyQYAXUTjEQtZJTKcF0E2UKTh+osDLsgNim9Q==
 
-xmlbuilder2@^2.3.1:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/xmlbuilder2/-/xmlbuilder2-2.3.1.tgz#e119067fe7a76bd6d4519af4710ef88caf229ee1"
-  integrity sha512-dttHZxVtdHLhuCZ/ArzKpEO3n2yGtGIfSR5XntDwcPuWvWwuv0Lcb2Cz4A9sntx6BQd3J8U0YXM3cr5XCkn4lw==
+xmlbuilder2@^2.4.1:
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/xmlbuilder2/-/xmlbuilder2-2.4.1.tgz#899c783a833188c5a5aa6f3c5428a3963f3e479d"
+  integrity sha512-vliUplZsk5vJnhxXN/mRcij/AE24NObTUm/Zo4vkLusgayO6s3Et5zLEA14XZnY1c3hX5o1ToR0m0BJOPy0UvQ==
   dependencies:
     "@oozcitak/dom" "1.15.8"
     "@oozcitak/infra" "1.0.8"
     "@oozcitak/util" "8.3.8"
+    "@types/node" "*"
     js-yaml "3.14.0"
 
 xtend@^4.0.0, xtend@^4.0.1, xtend@~4.0.1:
