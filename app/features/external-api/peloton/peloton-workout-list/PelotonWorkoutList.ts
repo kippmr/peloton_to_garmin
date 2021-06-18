@@ -1,34 +1,34 @@
 export type PelotonWorkoutList = {
-  data: [
-    {
-      created: number;
-      created_at: number;
-      device_time_created_at: number;
-      device_type: string;
-      effort_zones: any;
-      end_time: number;
-      fitbit_id: number;
-      fitness_discipline: string;
-      has_leaderboard_metrics: boolean;
-      has_pedaling_metrics: boolean;
-      id: string;
-      is_total_work_personal_record: boolean;
-      metrics_type: string;
-      name: string;
-      peloton_id: string;
-      platform: string;
-      ride: PelotonWorkoutListRide;
-      status: string;
-      strava_id: string;
-      timezone: string;
-      title: any;
-      total_video_buffering_seconds: number;
-      total_video_watch_time_seconds: number;
-      total_work: number;
-      user_id: string;
-      workout_type: string;
-    }
-  ];
+  data: PelotonWorkout[];
+};
+
+export type PelotonWorkout = {
+  created: number;
+  created_at: number;
+  device_time_created_at: number;
+  device_type: string;
+  effort_zones: any;
+  end_time: number;
+  fitbit_id: number;
+  fitness_discipline: string;
+  has_leaderboard_metrics: boolean;
+  has_pedaling_metrics: boolean;
+  id: string;
+  is_total_work_personal_record: boolean;
+  metrics_type: string;
+  name: string;
+  peloton_id: string;
+  platform: string;
+  ride: PelotonWorkoutListRide;
+  status: string;
+  strava_id: string;
+  timezone: string;
+  title: any;
+  total_video_buffering_seconds: number;
+  total_video_watch_time_seconds: number;
+  total_work: number;
+  user_id: string;
+  workout_type: string;
 };
 
 export type PelotonWorkoutListRide = {

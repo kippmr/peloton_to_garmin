@@ -1,10 +1,10 @@
 import { create } from 'xmlbuilder2';
 import { PelotonPerformaceData } from '../../external-api/peloton/peloton-performance-data/PelotonPerformaceData';
 
-export function PelotonWorkoutToTcx(
+const useConvertPelotonToTcx = (
   workoutJson: PelotonPerformaceData,
   startTime: Date
-): string {
+): string => {
   const root = create({ encoding: 'UTF-8' })
     .ele('TrainingCenterDatabase', {
       'xmlns:ns2': 'http://www.garmin.com/xmlschemas/UserProfile/v2',
@@ -196,4 +196,6 @@ export function PelotonWorkoutToTcx(
   // console.log('xml', xml);
 
   return xml;
-}
+};
+
+export default useConvertPelotonToTcx;

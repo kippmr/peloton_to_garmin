@@ -4,10 +4,8 @@ import Axios from 'axios';
 import { PelotonLoginResponse } from '../../external-api/peloton/login/PelotonLoginResponse';
 import { PelotonWorkoutList } from '../../external-api/peloton/peloton-workout-list/PelotonWorkoutList';
 import '../../counter/Counter.css';
-import styles from '../../counter/Counter.css';
-import { PelotonWorkoutToTcx } from '../peloton-workout-to-tcx/PelotonWorkoutToTcx';
 import { remote } from 'electron';
-import { PelotonPerformaceData } from '../../external-api/peloton/peloton-performance-data/PelotonPerformaceData';
+import WorkoutCard from '../../../components/workout-card/WorkoutCard';
 
 export type GetWorkoutsProps = {
   credentials: CredentialsProperties[];
@@ -49,17 +47,21 @@ export const GetWorkouts: React.FunctionComponent<GetWorkoutsProps> = ({
         );
         console.log('get response', listResponse);
 
-        const workoutResponse = await Axios.get<PelotonPerformaceData>(
-          `https://api.onepeloton.ca/api/workout/${listResponse.data.data[0].id}/performance_graph?every_n=1`
-        );
-        console.log('workout response', workoutResponse.data);
-        console.log(
-          'convert',
-          PelotonWorkoutToTcx(
-            workoutResponse.data,
-            new Date(listResponse.data.data[0].device_time_created_at * 1000)
-          )
-        );
+        // FORCE TEST PELOTON TO TCX
+
+        // const workoutResponse = await Axios.get<PelotonPerformaceData>(
+        //   `https://api.onepeloton.ca/api/workout/${listResponse.data.data[0].id}/performance_graph?every_n=1`
+        // );
+        // console.log('workout response', workoutResponse.data);
+        // console.log(
+        //   'convert',
+        //   PelotonWorkoutToTcx(
+        //     workoutResponse.data,
+        //     new Date(listResponse.data.data[0].device_time_created_at * 1000)
+        //   )
+        // );
+
+        // BAD API CALLS
 
         // const response = await Axios({
         //   method: 'post',
@@ -99,33 +101,8 @@ export const GetWorkouts: React.FunctionComponent<GetWorkoutsProps> = ({
 
   return (
     <div>
-      <pre style={{ width: '800px' }}>{JSON.stringify(data)}</pre>
       {data?.data.map((workout) => {
-        return (
-          <div className={'card ' + styles.base_card_lg}>
-            <h3 className={'card-header'}>
-              {workout.fitness_discipline === 'cycling' ? '🚲' : '💪'}{' '}
-              {workout.ride.title} at{' '}
-              {new Date(workout.created_at * 1000).toLocaleString()}
-            </h3>
-            <div className={'card-body'}>
-              <div className="row g-0 position-relative">
-                <div className="col-md-3 mb-md-0 p-md-1">
-                  <img src={workout.ride.image_url} className="w-100" alt="" />
-                </div>
-                <div className="col-md-9">
-                  <p>{JSON.stringify(workout.id)}</p>
-                  <button
-                    className="btn btn-primary stretched-link"
-                    onClick={() => console.log('printed')}
-                  >
-                    Go somewhere
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
+        return <WorkoutCard key={workout.id} workout={workout} />;
       })}
     </div>
   );
