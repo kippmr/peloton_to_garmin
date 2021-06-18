@@ -102,7 +102,13 @@ export const GetWorkouts: React.FunctionComponent<GetWorkoutsProps> = ({
   return (
     <div>
       {data?.data.map((workout) => {
-        return <WorkoutCard key={workout.id} workout={workout} />;
+        return (
+          <WorkoutCard
+            key={workout.id}
+            workout={workout}
+            credentials={credentials}
+          />
+        );
       })}
     </div>
   );

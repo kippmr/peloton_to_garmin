@@ -5,11 +5,16 @@ import useConvertPelotonToTcx from '../../features/upload/peloton-workout-to-tcx
 import Axios from 'axios';
 import { PelotonPerformaceData } from '../../features/external-api/peloton/peloton-performance-data/PelotonPerformaceData';
 import useWorkoutUpload from '../../features/upload/upload-workout/useWorkoutUpload';
+import { CredentialsProperties } from '../../db/schemas/credentials';
 
-export type WorkoutCardProps = { workout: PelotonWorkout };
+export type WorkoutCardProps = {
+  workout: PelotonWorkout;
+  credentials: CredentialsProperties[];
+};
 
 const WorkoutCard: React.FunctionComponent<WorkoutCardProps> = ({
   workout,
+  credentials,
 }) => {
   const onClick = async () => {
     const workoutResponse = await Axios.get<PelotonPerformaceData>(
@@ -21,7 +26,7 @@ const WorkoutCard: React.FunctionComponent<WorkoutCardProps> = ({
       new Date(workout.device_time_created_at * 1000)
     );
 
-    useWorkoutUpload(tcxString);
+    await useWorkoutUpload(tcxString, credentials);
   };
 
   return (
