@@ -50,7 +50,7 @@ export const GetWorkouts: React.FunctionComponent<GetWorkoutsProps> = ({
         console.log('get response', listResponse);
 
         const workoutResponse = await Axios.get<PelotonPerformaceData>(
-          `https://api.onepeloton.ca/api/workout/fc6e5b494fc04043a76cd230aa4486b0/performance_graph?every_n=1` // ${listResponse.data.data[0].id}/performance_graph?every_n=5`
+          `https://api.onepeloton.ca/api/workout/${listResponse.data.data[0].id}/performance_graph?every_n=1`
         );
         console.log('workout response', workoutResponse.data);
         console.log(

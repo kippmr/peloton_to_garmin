@@ -18,9 +18,9 @@ export function PelotonWorkoutToTcx(
     .ele('Activities')
     .ele('Activity', { Sport: 'Biking' })
     .ele('Id')
-    .txt(startTime.toISOString())
+    .txt(startTime.toISOString().split('.')[0] + 'Z')
     .up()
-    .ele('Lap', { StartTime: startTime.toISOString() })
+    .ele('Lap', { StartTime: startTime.toISOString().split('.')[0] + 'Z' })
     .ele('TotalTimeSeconds')
     .txt(workoutJson.duration.toString())
     .up()
@@ -134,9 +134,13 @@ export function PelotonWorkoutToTcx(
       ) / 10;
     totalDistanceMeters += speedMetersPerSecond;
     root
-      .ele('TrackPoint')
+      .ele('Trackpoint')
       .ele('Time')
-      .txt(new Date(startTime.getTime() + value * 1000).toISOString())
+      .txt(
+        new Date(startTime.getTime() + value * 1000)
+          .toISOString()
+          .split('.')[0] + 'Z'
+      )
       .up()
       .ele('DistanceMeters')
       .txt((Math.round(totalDistanceMeters * 10) / 10).toString())
@@ -145,7 +149,7 @@ export function PelotonWorkoutToTcx(
       .ele('Value')
       .txt(
         (
-          workoutJson.metrics.find((metric) => metric.slug === 'heart rate')
+          workoutJson.metrics.find((metric) => metric.slug === 'heart_rate')
             ?.values[index] || 0
         ).toString()
       )
@@ -187,7 +191,7 @@ export function PelotonWorkoutToTcx(
       .up();
   });
 
-  const xml = root.end({ prettyPrint: true });
+  const xml = root.end({ headless: true });
 
   // console.log('xml', xml);
 
